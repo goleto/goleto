@@ -34,7 +34,7 @@ func Parse(s string) (Boleto, error) {
 		fallthrough
 	case 44:
 		if isValidBarcode(s) {
-			return Boleto{validBarcode(s)}, nil
+			return Boleto{s}, nil
 		}
 	}
 	return Boleto{}, ErrInvalidBarcode

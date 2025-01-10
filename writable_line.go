@@ -7,16 +7,16 @@ import (
 func isValidWritableLine(writableLine string) bool {
 	b := *(*[]byte)(unsafe.Pointer(&writableLine))
 
-	return calcWritableLineFieldCheckDigit(b[0:9]) == b[9]-48 &&
-		calcWritableLineFieldCheckDigit(b[10:20]) == b[20]-48 &&
-		calcWritableLineFieldCheckDigit(b[21:31]) == b[31]-48
+	return calcWritableLineFieldCheckDigit(b[0:9]) == b[9]-'0' &&
+		calcWritableLineFieldCheckDigit(b[10:20]) == b[20]-'0' &&
+		calcWritableLineFieldCheckDigit(b[21:31]) == b[31]-'0'
 }
 
 func calcWritableLineFieldCheckDigit(b []byte) uint8 {
 	var sum int
 	max := len(b) - 1
 	for i := range b {
-		d := (2 - (i & 1)) * int(b[max-i]-48)
+		d := (2 - (i & 1)) * int(b[max-i]-'0')
 		if d > 9 {
 			sum += d - 9
 		} else {

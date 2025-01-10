@@ -1,19 +1,18 @@
 package goleto
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 )
 
-type validBarcode string
-
 type Boleto struct {
-	validBarcode
+	validBarcode string
 }
 
 // Barcode returns the Boleto on bar code format.
 func (b Boleto) Barcode() string {
-	return string(b.validBarcode)
+	return b.validBarcode
 }
 
 // WritableLine returns the Boleto on writable line format.
@@ -47,9 +46,27 @@ func (b Boleto) CurrencyCode() string {
 //	month - the month of the expiration date
 //	day   - the day of the expiration date
 func (b Boleto) ExpirationDate() (year int, month time.Month, day int) {
-	days, _ := strconv.ParseUint(string(b.validBarcode[5:9]), 10, 31)
+	return b.calcExpirationDateAt(time.Now())
+}
 
-	return time.Date(1997, time.August, 7, 0, 0, 0, 0, nil).AddDate(0, 0, int(days)).Date()
+var brTz *time.Location
+
+func (b Boleto) calcExpirationDateAt(now time.Time) (year int, month time.Month, day int) {
+	factor, _ := strconv.ParseInt(string(b.validBarcode[5:9]), 10, 32)
+
+	epoch := time.Date(2000, time.July, 3, 0, 0, 0, 0, brTz)
+
+	today := now.In(brTz)
+	daysSinceEpoch := int64(today.Sub(epoch) / (24 * time.Hour))
+	epochAdjust := (daysSinceEpoch % 9000) - (factor - 1000)
+
+	if epochAdjust >= 4500 {
+		epochAdjust -= 9000
+	} else if epochAdjust < -4500 {
+		epochAdjust += 9000
+	}
+
+	return epoch.AddDate(0, 0, int(daysSinceEpoch-epochAdjust)).Date()
 }
 
 // Value extracts and returns the monetary value of the Boleto in cents.
@@ -67,4 +84,12 @@ func (b Boleto) Value() uint64 {
 // 44th  character of the validBarcode field. This data is opaque and handled by each bank.
 func (b Boleto) FreeField() string {
 	return string(b.validBarcode[19:44])
+}
+
+func init() {
+	var err error
+	brTz, err = time.LoadLocation("America/Sao_Paulo")
+	if err != nil {
+		panic(fmt.Sprintf("cannot load Brasília time zone: %v", err))
+	}
 }
