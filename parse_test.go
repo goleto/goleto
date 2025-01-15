@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestParse(t *testing.T) {
+func TestParseBoleto(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   string
@@ -49,9 +49,61 @@ func TestParse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := Parse(tt.input)
+			_, err := ParseBoleto(tt.input)
 			if err != tt.wantErr {
-				t.Errorf("Parse() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ParseBoleto() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+func TestParseGda(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		wantErr error
+	}{
+		{
+			name:    "Valid GDA barcode",
+			input:   "83870000001788500384070114544582001932367693",
+			wantErr: nil,
+		},
+		{
+			name:    "Valid GDA barcode 2",
+			input:   "81770000000010936599704113107970300143370831",
+			wantErr: nil,
+		},
+		{
+			name:    "Valid GDA writable line",
+			input:   "838700000010788500384078011454458202019323676937",
+			wantErr: nil,
+		},
+		{
+			name:    "Valid GDA writable line 2",
+			input:   "817700000000010936599702411310797039001433708318",
+			wantErr: nil,
+		},
+		{
+			name:    "Invalid characters",
+			input:   "83660abc0001503080048100914041160600000000000",
+			wantErr: ErrInvalidBarcode,
+		},
+		{
+			name:    "Invalid length",
+			input:   "8366000000150308004810091404116060000000000",
+			wantErr: ErrInvalidBarcode,
+		},
+		{
+			name:    "Invalid GDA writable line",
+			input:   "836600000015030800481009140411606000000000000000",
+			wantErr: ErrInvalidBarcode,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := ParseGda(tt.input)
+			if err != tt.wantErr {
+				t.Errorf("ParseGda() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

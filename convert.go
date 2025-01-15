@@ -2,11 +2,10 @@ package goleto
 
 import (
 	"strings"
-	"unsafe"
 )
 
-// writableLineToBarcode converts a writable line string to a barcode string.
-func writableLineToBarcode(writableLine string) string {
+// writableLineToBoletoBarcode converts a writable line string to a barcode string.
+func writableLineToBoletoBarcode(writableLine string) string {
 	var b strings.Builder
 
 	b.Grow(44)
@@ -23,30 +22,59 @@ func writableLineToBarcode(writableLine string) string {
 	return b.String()
 }
 
-// barcodeToWritableLine converts a barcode string to a writable line format.
-func barcodeToWritableLine(barcode string) string {
-	var sb strings.Builder
+func writableLineToGdaBarcode(writableLine string) string {
+	var b strings.Builder
 
-	sb.Grow(47)
+	b.Grow(44)
 
-	sb.WriteString(barcode[:4])
-	sb.WriteString(barcode[19:24])
-	sb.WriteByte('0') // first check digit
+	b.WriteString(writableLine[0:11])
+	b.WriteString(writableLine[12:23])
+	b.WriteString(writableLine[24:35])
+	b.WriteString(writableLine[36:47])
 
-	sb.WriteString(barcode[24:34])
-	sb.WriteByte('0') // second check digit
+	return b.String()
+}
 
-	sb.WriteString(barcode[34:44])
-	sb.WriteByte('0') // third check digit
+// boletoBarcodeToWritableLine converts a boleto barcode string to a writable line format.
+func boletoBarcodeToWritableLine(barcode string) string {
+	var b [47]byte
 
-	sb.WriteString(barcode[4:19])
+	copy(b[0:4], barcode[0:4])
+	copy(b[4:9], barcode[19:24])
 
-	s := sb.String()
-	b := *(*[]byte)(unsafe.Pointer(&s))
+	copy(b[10:20], barcode[24:34])
+	copy(b[21:31], barcode[34:44])
 
-	b[9] = calcWritableLineFieldCheckDigit(b[0:9]) + '0'
-	b[20] = calcWritableLineFieldCheckDigit(b[10:20]) + '0'
-	b[31] = calcWritableLineFieldCheckDigit(b[21:31]) + '0'
+	copy(b[32:47], barcode[4:19])
 
-	return s
+	b[9] = dac10(b[0:9]) + '0'
+	b[20] = dac10(b[10:20]) + '0'
+	b[31] = dac10(b[21:31]) + '0'
+
+	return string(b[:])
+}
+
+// gdaBarcodeToWritableLine converts a GDA barcode string to a writable line format.
+func gdaBarcodeToWritableLine(barcode string) string {
+	var b [48]byte
+	var checkFn func(b ...[]byte) uint8
+
+	switch b[2] {
+	case '6', '7':
+		checkFn = dac10
+	default:
+		checkFn = gdaDac11
+	}
+
+	copy(b[0:11], barcode[0:11])
+	copy(b[12:23], barcode[11:22])
+	copy(b[24:35], barcode[22:33])
+	copy(b[36:47], barcode[33:44])
+
+	b[11] = checkFn(b[0:11]) + '0'
+	b[23] = checkFn(b[12:23]) + '0'
+	b[35] = checkFn(b[24:35]) + '0'
+	b[47] = checkFn(b[36:47]) + '0'
+
+	return string(b[:])
 }
