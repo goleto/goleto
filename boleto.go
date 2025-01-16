@@ -17,7 +17,7 @@ func (b Boleto) Barcode() string {
 
 // WritableLine returns the Boleto on writable line format.
 func (b Boleto) WritableLine() string {
-	return boletoBarcodeToWritableLine(b.validBarcode)
+	return b.barcodeToWritableLine(b.validBarcode)
 }
 
 // BankCode returns the bank code extracted from the valid barcode of the Boleto.

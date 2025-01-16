@@ -32,7 +32,8 @@ func TestIsValidGdaWritableLine(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isValidGdaWritableLine(tt.writableLine); got != tt.expectedValid {
+			var g Gda
+			if got := g.isValidWritableLine(tt.writableLine); got != tt.expectedValid {
 				t.Errorf("isValidGdaWritableLine() = %v, want %v", got, tt.expectedValid)
 			}
 		})

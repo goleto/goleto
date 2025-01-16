@@ -5,8 +5,8 @@ import (
 	"unicode"
 )
 
-// ErrInvalidBarcode is returned when the provided barcode does not meet the expected format or criteria.
-var ErrInvalidBarcode = errors.New("invalid barcode")
+// ErrInvalidCode is returned when the provided barcode or writable line does not meet the expected format or criteria.
+var ErrInvalidCode = errors.New("invalid code")
 
 // ParseBoleto takes a string `s` representing a boleto (Brazilian payment slip) and
 // returns a Boleto struct if the string is a valid barcode or writable line.
@@ -16,27 +16,9 @@ var ErrInvalidBarcode = errors.New("invalid barcode")
 //
 // Returns:
 //   - Boleto: A struct representing the valid boleto.
-//   - error: An error if the boleto is invalid, specifically ErrInvalidBarcode.
+//   - error: An error if `s` is not a valid barcode or writable line, specifically ErrInvalidCode.
 func ParseBoleto(s string) (Boleto, error) {
-	for _, c := range s {
-		if !unicode.IsDigit(c) {
-			return Boleto{}, ErrInvalidBarcode
-		}
-	}
-
-	switch len(s) {
-	case 47:
-		if !isValidBoletoWritableLine(s) {
-			break
-		}
-		s = writableLineToBoletoBarcode(s)
-		fallthrough
-	case 44:
-		if isValidBoletoBarcode(s) {
-			return Boleto{s}, nil
-		}
-	}
-	return Boleto{}, ErrInvalidBarcode
+	return parse[Boleto](s)
 }
 
 // ParseGda parses a given string to create a Gda (Guia de Arrecadação) if the string is a valid GDA barcode or writable line.
@@ -44,29 +26,46 @@ func ParseBoleto(s string) (Boleto, error) {
 // It returns a Gda object and nil error if the string is valid, otherwise it returns an empty Gda object and an ErrInvalidBarcode error.
 //
 // Parameters:
-//   - s: The string to be parsed.
+//   - s: A barcode or writable line string.
 //
 // Returns:
 //   - Gda: The parsed Gda object if the string is valid.
 //   - error: An error indicating the string is not a valid GDA, specifically ErrInvalidBarcode.
 func ParseGda(s string) (Gda, error) {
+	return parse[Gda](s)
+}
+
+type parsable interface {
+	writableLineLength() int
+	isValidWritableLine(string) bool
+	writableLineToBarcode(string) string
+	isValidBarcode(string) bool
+}
+
+func parse[P parsable, PP interface {
+	setValidBarcode(string)
+	*P
+}](s string) (p P, err error) {
 	for _, c := range s {
 		if !unicode.IsDigit(c) {
-			return Gda{}, ErrInvalidBarcode
+			err = ErrInvalidCode
+			return
 		}
 	}
 
 	switch len(s) {
-	case 48:
-		if !isValidGdaWritableLine(s) {
+	case p.writableLineLength():
+		if !p.isValidWritableLine(s) {
 			break
 		}
-		s = writableLineToGdaBarcode(s)
+		s = p.writableLineToBarcode(s)
 		fallthrough
 	case 44:
-		if isValidGdaBarcode(s) {
-			return Gda{s}, nil
+		if p.isValidBarcode(s) {
+			PP(&p).setValidBarcode(s)
+			return
 		}
 	}
-	return Gda{}, ErrInvalidBarcode
+	err = ErrInvalidCode
+	return
 }

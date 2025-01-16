@@ -15,7 +15,8 @@ package main
 
 import (
     "fmt"
-    "goleto"
+
+    "github.com/goleto/goleto"
 )
 
 func main() {
@@ -43,7 +44,8 @@ package main
 
 import (
     "fmt"
-    "goleto"
+
+    "github.com/goleto/goleto"
 )
 
 func main() {

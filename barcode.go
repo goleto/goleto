@@ -1,33 +1,39 @@
 package goleto
 
-func isValidBoletoBarcode(boleto string) bool {
-	b := []byte(boleto)
-	v := b[4] - 48
-	return boletoDac11(b[0:4], b[5:]) == v
+func (Boleto) isValidBarcode(barcode string) bool {
+	b := []byte(barcode)
+	return boletoDac11(b[0:4], b[5:44]) == b[4]
 }
 
-func isValidGdaBarcode(boleto string) bool {
-	var checkFn func(b ...[]byte) uint8
-	b := []byte(boleto)
+func (Gda) isValidBarcode(barcode string) bool {
+	b := []byte(barcode)
 
-	if b[0] != '8' {
+	// The first digit in barcode is the product ID, 8 is the only valid value
+	productId := b[0]
+	if productId != '8' {
 		// Invalid product ID
 		return false
 	}
 
-	if !(b[1] >= '1' && b[1] <= '9' && b[1] != '8') {
+	// The second digit in barcode is the segment ID, 0 and 8 are invalid
+	segmentId := b[1]
+	if !(segmentId >= '1' && segmentId <= '9' && segmentId != '8') {
 		// Invalid Segment ID
 		return false
 	}
 
-	switch b[2] {
-	case '6', '7':
-		checkFn = dac10
-	case '8', '9':
-		checkFn = gdaDac11
-	default:
+	checkFn, err := gdaCheckFn(b)
+	if err != nil {
 		return false
 	}
 
-	return checkFn(b[0:3], b[4:44]) == b[3]-'0'
+	return checkFn(b[0:3], b[4:44]) == b[3]
+}
+
+func (b *Boleto) setValidBarcode(validBarcode string) {
+	b.validBarcode = validBarcode
+}
+
+func (g *Gda) setValidBarcode(validBarcode string) {
+	g.validBarcode = validBarcode
 }

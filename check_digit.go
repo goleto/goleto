@@ -1,5 +1,7 @@
 package goleto
 
+import "errors"
+
 // dac10 calculates the DAC10 (Modulo 10) check digit for the given chunks of bytes
 // It takes one or more slices of bytes as input, where each byte represents a digit ('0'-'9').
 // The function treats all chunks as a single concatenated string.
@@ -26,9 +28,9 @@ func dac10(chunks ...[]byte) uint8 {
 	rem := uint8(sum % 10)
 
 	if rem == 0 {
-		return 0
+		return '0'
 	} else {
-		return 10 - rem
+		return 10 - rem + '0'
 	}
 }
 
@@ -50,7 +52,7 @@ func dac11(adjustRem func(uint8) uint8, chunks ...[]byte) uint8 {
 		}
 	}
 
-	return adjustRem(uint8(sum % 11))
+	return adjustRem(uint8(sum%11)) + '0'
 }
 
 func boletoDac11(chunks ...[]byte) uint8 {
@@ -79,4 +81,18 @@ func gdaDac11AdjustRem(rem uint8) uint8 {
 	default:
 		return 11 - rem
 	}
+}
+
+func gdaCheckFn(b []byte) (checkFn func(b ...[]byte) uint8, err error) {
+	// Infer the check digit algorithm from the third digit in barcode
+	switch b[2] {
+	case '6', '7': // when it's 6 or 7, it uses DAC 10
+		checkFn = dac10
+	case '8', '9': // when it's 6 or 7, it uses DAC 11
+		checkFn = gdaDac11
+	default: // other values are invalid
+		checkFn = gdaDac11
+		err = errors.New("invalid check fn")
+	}
+	return
 }

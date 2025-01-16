@@ -14,13 +14,13 @@ type Gda struct {
 }
 
 // Barcode returns the Boleto on bar code format.
-func (b Gda) Barcode() string {
-	return b.validBarcode
+func (g Gda) Barcode() string {
+	return g.validBarcode
 }
 
 // WritableLine returns the Boleto on writable line format.
-func (b Gda) WritableLine() string {
-	return gdaBarcodeToWritableLine(string(b.validBarcode))
+func (g Gda) WritableLine() string {
+	return g.barcodeToWritableLine(g.validBarcode)
 }
 
 // SegmentId returns segment identifier of this GDA.

@@ -4,8 +4,7 @@ import (
 	"strings"
 )
 
-// writableLineToBoletoBarcode converts a writable line string to a barcode string.
-func writableLineToBoletoBarcode(writableLine string) string {
+func (Boleto) writableLineToBarcode(writableLine string) string {
 	var b strings.Builder
 
 	b.Grow(44)
@@ -22,7 +21,7 @@ func writableLineToBoletoBarcode(writableLine string) string {
 	return b.String()
 }
 
-func writableLineToGdaBarcode(writableLine string) string {
+func (Gda) writableLineToBarcode(writableLine string) string {
 	var b strings.Builder
 
 	b.Grow(44)
@@ -35,8 +34,7 @@ func writableLineToGdaBarcode(writableLine string) string {
 	return b.String()
 }
 
-// boletoBarcodeToWritableLine converts a boleto barcode string to a writable line format.
-func boletoBarcodeToWritableLine(barcode string) string {
+func (Boleto) barcodeToWritableLine(barcode string) string {
 	var b [47]byte
 
 	copy(b[0:4], barcode[0:4])
@@ -47,34 +45,26 @@ func boletoBarcodeToWritableLine(barcode string) string {
 
 	copy(b[32:47], barcode[4:19])
 
-	b[9] = dac10(b[0:9]) + '0'
-	b[20] = dac10(b[10:20]) + '0'
-	b[31] = dac10(b[21:31]) + '0'
+	b[9] = dac10(b[0:9])
+	b[20] = dac10(b[10:20])
+	b[31] = dac10(b[21:31])
 
 	return string(b[:])
 }
 
-// gdaBarcodeToWritableLine converts a GDA barcode string to a writable line format.
-func gdaBarcodeToWritableLine(barcode string) string {
+func (Gda) barcodeToWritableLine(barcode string) string {
 	var b [48]byte
-	var checkFn func(b ...[]byte) uint8
-
-	switch b[2] {
-	case '6', '7':
-		checkFn = dac10
-	default:
-		checkFn = gdaDac11
-	}
 
 	copy(b[0:11], barcode[0:11])
 	copy(b[12:23], barcode[11:22])
 	copy(b[24:35], barcode[22:33])
 	copy(b[36:47], barcode[33:44])
 
-	b[11] = checkFn(b[0:11]) + '0'
-	b[23] = checkFn(b[12:23]) + '0'
-	b[35] = checkFn(b[24:35]) + '0'
-	b[47] = checkFn(b[36:47]) + '0'
+	checkFn, _ := gdaCheckFn(b[:])
+	b[11] = checkFn(b[0:11])
+	b[23] = checkFn(b[12:23])
+	b[35] = checkFn(b[24:35])
+	b[47] = checkFn(b[36:47])
 
 	return string(b[:])
 }

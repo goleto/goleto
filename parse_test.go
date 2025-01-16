@@ -33,17 +33,17 @@ func TestParseBoleto(t *testing.T) {
 		{
 			name:    "Invalid characters",
 			input:   "12345abc901234567890123456789012345678901234",
-			wantErr: ErrInvalidBarcode,
+			wantErr: ErrInvalidCode,
 		},
 		{
 			name:    "Invalid length",
 			input:   "1234567890123456789012345678901234567890123",
-			wantErr: ErrInvalidBarcode,
+			wantErr: ErrInvalidCode,
 		},
 		{
 			name:    "Invalid writable line",
 			input:   "12345678901234567890123456789012345678901234568",
-			wantErr: ErrInvalidBarcode,
+			wantErr: ErrInvalidCode,
 		},
 	}
 
@@ -85,17 +85,17 @@ func TestParseGda(t *testing.T) {
 		{
 			name:    "Invalid characters",
 			input:   "83660abc0001503080048100914041160600000000000",
-			wantErr: ErrInvalidBarcode,
+			wantErr: ErrInvalidCode,
 		},
 		{
 			name:    "Invalid length",
 			input:   "8366000000150308004810091404116060000000000",
-			wantErr: ErrInvalidBarcode,
+			wantErr: ErrInvalidCode,
 		},
 		{
 			name:    "Invalid GDA writable line",
 			input:   "836600000015030800481009140411606000000000000000",
-			wantErr: ErrInvalidBarcode,
+			wantErr: ErrInvalidCode,
 		},
 	}
 
