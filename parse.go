@@ -42,10 +42,12 @@ type parsable interface {
 	isValidBarcode(string) bool
 }
 
-func parse[P parsable, PP interface {
+type updatable[T any] interface {
 	setValidBarcode(string)
-	*P
-}](s string) (p P, err error) {
+	*T
+}
+
+func parse[P parsable, PP updatable[P]](s string) (p P, err error) {
 	for _, c := range s {
 		if !unicode.IsDigit(c) {
 			err = ErrInvalidCode
