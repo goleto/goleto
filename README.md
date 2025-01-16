@@ -1,4 +1,4 @@
-<img alt="Goleto icon" src="goleto.svg" width="100">
+![Goleto icon](./goleto.svg)
 
 # &nbsp;Goleto
 
