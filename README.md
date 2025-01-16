@@ -1,4 +1,6 @@
-# goleto
+<img alt="Goleto icon" src="goleto.svg" width="100">
+
+# &nbsp;Goleto
 
 Goleto is a library to parse strings into valid boletos or GDAs (Guia de Arrecadação).
 
