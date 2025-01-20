@@ -16,26 +16,27 @@ A valid GDA string is a sequency of 44 or 48 characters that obey the standard d
 package main
 
 import (
-    "fmt"
+	"fmt"
 
-    "github.com/goleto/goleto"
+	"github.com/goleto/goleto"
 )
 
 func main() {
-    barcode := "02194999400000368626566857200001797430402100"
-    boleto, err := goleto.ParseBoleto(barcode)
-    if err != nil {
-        fmt.Println("Error parsing boleto:", err)
-        return
+	barcode := "02194999400000368626566857200001797430402100"
+	boleto, err := goleto.ParseBoleto(barcode)
+	if err != nil {
+		fmt.Println("Error parsing boleto:", err)
+		return
     }
 
-    fmt.Println("Barcode:", boleto.Barcode())
-    fmt.Println("Writable Line:", boleto.WritableLine())
-    fmt.Println("Bank Code:", boleto.BankCode())
-    fmt.Println("Currency Code:", boleto.CurrencyCode())
-    fmt.Println("Expiration Date:", boleto.ExpirationDate())
-    fmt.Println("Value:", boleto.Value())
-    fmt.Println("Free Field:", boleto.FreeField())
+	fmt.Println("Barcode:", boleto.Barcode())
+	fmt.Println("Writable Line:", boleto.WritableLine())
+	fmt.Println("Bank Code:", boleto.BankCode())
+	fmt.Println("Currency Code:", boleto.CurrencyCode())
+	y, m, d := boleto.ExpirationDate()
+	fmt.Printf("Expiration Date: %d-%02d-%02d\n", y, m, d)
+	fmt.Println("Value:", boleto.Value())
+	fmt.Println("Free Field:", boleto.FreeField())
 }
 ```
 
@@ -45,25 +46,25 @@ func main() {
 package main
 
 import (
-    "fmt"
+	"fmt"
 
-    "github.com/goleto/goleto"
+	"github.com/goleto/goleto"
 )
 
 func main() {
-    barcode := "817700000000010936599702411310797039001433708318"
-    gda, err := goleto.ParseGda(barcode)
-    if err != nil {
-        fmt.Println("Error parsing GDA:", err)
-        return
-    }
+	barcode := "817700000000010936599702411310797039001433708318"
+	gda, err := goleto.ParseGda(barcode)
+	if err != nil {
+		fmt.Println("Error parsing GDA:", err)
+		return
+	}
 
-    fmt.Println("Barcode:", gda.Barcode())
-    fmt.Println("Writable Line:", gda.WritableLine())
-    fmt.Println("Segment ID:", gda.SegmentId())
-    fmt.Println("Company ID:", gda.CompanyId())
-    fmt.Println("Value Type:", gda.ValueType())
-    fmt.Println("Value:", gda.Value())
-    fmt.Println("Free Field:", gda.FreeField())
+	fmt.Println("Barcode:", gda.Barcode())
+	fmt.Println("Writable Line:", gda.WritableLine())
+	fmt.Println("Segment ID:", gda.SegmentId())
+	fmt.Println("Company ID:", gda.CompanyId())
+	fmt.Println("Value Type:", gda.ValueType())
+	fmt.Println("Value:", gda.Value())
+	fmt.Println("Free Field:", gda.FreeField())
 }
 ```
