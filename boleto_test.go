@@ -42,6 +42,18 @@ func TestBoleto(t *testing.T) {
 			expectedFree:         "0001121154691201045051738",
 			expectedWritableLine: "70790001182115469120410450517387211900000042148",
 		},
+		{
+			name:                 "Valid Barcode 2 with 1997 date",
+			barcode:              "34196000200000233331098211174108055015849000",
+			expectedBank:         "341",
+			expectedCurr:         "9",
+			expectedYear:         1997,
+			expectedMonth:        time.August,
+			expectedDay:          9,
+			expectedValue:        23333,
+			expectedFree:         "1098211174108055015849000",
+			expectedWritableLine: "34191098261117410805750158490008600020000023333",
+		},
 	}
 
 	for _, tt := range tests {

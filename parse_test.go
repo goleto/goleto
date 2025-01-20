@@ -21,6 +21,11 @@ func TestParseBoleto(t *testing.T) {
 			wantErr: nil,
 		},
 		{
+			name:    "Valid barcode with date factor less then 1000",
+			input:   "34196000200000233331098211174108055015849000",
+			wantErr: nil,
+		},
+		{
 			name:    "Valid writable line",
 			input:   "02196566835720000179074304021004499940000036862",
 			wantErr: nil,
