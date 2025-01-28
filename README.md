@@ -2,7 +2,7 @@
 
 # &nbsp;Goleto
 
-Goleto is a library to parse strings into valid boletos or GDAs (Guia de Arrecadação).
+Goleto is a library to parse strings into valid boletos or GDAs (Guia de Arrecadação) and generate valid payment boletos from parts.
 
 A valid boleto string is a sequency of 44 or 47 characters that obey the standard defined on [section 2.3 of Banco do Brasil's boleto de pagamento spec](https://www.bb.com.br/docs/pub/emp/empl/dwn/Doc5175Bloqueto.pdf).
 
@@ -66,5 +66,40 @@ func main() {
 	fmt.Println("Value Type:", gda.ValueType())
 	fmt.Println("Value:", gda.Value())
 	fmt.Println("Free Field:", gda.FreeField())
+}
+```
+
+**Using `NewBoleto()` function**
+
+```go
+package main
+
+import (
+    "fmt"
+    "time"
+
+    "github.com/goleto/goleto"
+)
+
+func main() {
+    boleto, err := goleto.NewBoleto(
+        goleto.WithBankCode("001"),
+        goleto.WithExpirationDate(2024, time.January, 28),
+        goleto.WithValue(1000),
+        goleto.WithFreeField("1234567890123456789012345"),
+    )
+    if err != nil {
+        fmt.Println("Error creating boleto:", err)
+        return
+    }
+
+    fmt.Println("Barcode:", boleto.Barcode())
+    fmt.Println("Writable Line:", boleto.WritableLine())
+    fmt.Println("Bank Code:", boleto.BankCode())
+    fmt.Println("Currency Code:", boleto.CurrencyCode())
+    y, m, d := boleto.ExpirationDate()
+    fmt.Printf("Expiration Date: %d-%02d-%02d\n", y, m, d)
+    fmt.Println("Value:", boleto.Value())
+    fmt.Println("Free Field:", boleto.FreeField())
 }
 ```
