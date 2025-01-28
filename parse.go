@@ -2,7 +2,6 @@ package goleto
 
 import (
 	"errors"
-	"unicode"
 )
 
 // ErrInvalidCode is returned when the provided barcode or writable line does not meet the expected format or criteria.
@@ -48,11 +47,9 @@ type updatable[T any] interface {
 }
 
 func parse[P parsable, PP updatable[P]](s string) (p P, err error) {
-	for _, c := range s {
-		if !unicode.IsDigit(c) {
-			err = ErrInvalidCode
-			return
-		}
+	if !digitsOnly(s) {
+		err = ErrInvalidCode
+		return
 	}
 
 	switch len(s) {
