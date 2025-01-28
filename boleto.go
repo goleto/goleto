@@ -55,11 +55,11 @@ func (b Boleto) calcExpirationDateAt(now time.Time) (year int, month time.Month,
 	factor, _ := strconv.ParseInt(b.validBarcode[5:9], 10, 32)
 
 	if factor < 1000 {
-		epoch := time.Date(1997, time.August, 7, 0, 0, 0, 0, brTz)
+		epoch := time.Date(1997, time.August, 7, 12, 0, 0, 0, brTz)
 		return epoch.AddDate(0, 0, int(factor)).Date()
 	}
 
-	epoch := time.Date(2000, time.July, 3, 0, 0, 0, 0, brTz)
+	epoch := time.Date(2000, time.July, 3, 12, 0, 0, 0, brTz)
 
 	today := now.In(brTz)
 	daysSinceEpoch := int64(today.Sub(epoch) / (24 * time.Hour))

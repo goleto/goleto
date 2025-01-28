@@ -43,6 +43,18 @@ func TestBoleto(t *testing.T) {
 			expectedWritableLine: "70790001182115469120410450517387211900000042148",
 		},
 		{
+			name:                 "Valid Boleto - DST start",
+			barcode:              "00194694900000010001234567890123456789012345",
+			expectedBank:         "001",
+			expectedCurr:         "9",
+			expectedYear:         2016,
+			expectedMonth:        time.October,
+			expectedDay:          16,
+			expectedValue:        1000,
+			expectedFree:         "1234567890123456789012345",
+			expectedWritableLine: "00191234546789012345767890123457469490000001000",
+		},
+		{
 			name:                 "Valid Barcode 2 with 1997 date",
 			barcode:              "34196000200000233331098211174108055015849000",
 			expectedBank:         "341",
