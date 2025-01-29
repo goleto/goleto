@@ -57,23 +57,32 @@ func withExpirationDateAt(now time.Time, year int, month time.Month, day int) In
 	return func(bp *[44]byte) error {
 		epoch := time.Date(2000, time.July, 3, 0, 0, 0, 0, brTz)
 
-		expirationDate := time.Date(year, month, day, 12, 0, 0, 0, brTz)
-		factor := int64(expirationDate.Sub(epoch) / (24 * time.Hour))
+		expirationDate := time.Date(year, month, day, 0, 0, 0, 0, brTz)
+
+		if expirationDate.Before(epoch) {
+			expirationDate = expirationDate.Add(-12 * time.Hour)
+		} else {
+			expirationDate = expirationDate.Add(12 * time.Hour)
+		}
+
+		d := expirationDate.Sub(epoch)
+		day := 24 * time.Hour
+		factor := int64(d / day)
 
 		if factor < -1000 {
 			return ErrExpirationDateNotRepresentable
-		} else {
-			today := now.In(brTz)
-			daysSinceEpoch := int64(today.Sub(epoch) / (24 * time.Hour))
-
-			diff := factor - daysSinceEpoch
-
-			if diff > 4500 || diff <= -4500 {
-				return ErrExpirationDateNotRepresentable
-			}
-
-			factor %= 9000
 		}
+
+		today := now.In(brTz)
+		daysSinceEpoch := int64(today.Sub(epoch) / (24 * time.Hour))
+
+		diff := factor - daysSinceEpoch
+
+		if diff > 4500 || diff <= -4500 {
+			return ErrExpirationDateNotRepresentable
+		}
+
+		factor %= 9000
 
 		_, _ = fmt.Fprintf(bytes.NewBuffer(bp[:5]), "%04d", factor+1000)
 

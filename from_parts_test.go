@@ -28,6 +28,17 @@ func TestNewBoleto(t *testing.T) {
 			wantValid: "00194694900000010001234567890123456789012345",
 		},
 		{
+			name: "valid boleto - before 2000-07-03",
+			initArgs: []InitArg{
+				WithBankCode("001"),
+				withExpirationDateAt(time.Date(2000, time.January, 28, 0, 0, 0, 0, brTz), 2000, time.July, 2),
+				WithValue(1000),
+				WithFreeField("1234567890123456789012345"),
+			},
+			wantErr:   false,
+			wantValid: "00191099900000010001234567890123456789012345",
+		},
+		{
 			name: "valid boleto",
 			initArgs: []InitArg{
 				WithBankCode("001"),
