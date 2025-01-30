@@ -43,6 +43,30 @@ func TestBoleto(t *testing.T) {
 			expectedWritableLine: "70790001182115469120410450517387211900000042148",
 		},
 		{
+			name:                 "Valid Boleto 3",
+			barcode:              "02192100100000368626566857200001797430402100",
+			expectedBank:         "021",
+			expectedCurr:         "9",
+			expectedYear:         2025,
+			expectedMonth:        time.February,
+			expectedDay:          23,
+			expectedValue:        36862,
+			expectedFree:         "6566857200001797430402100",
+			expectedWritableLine: "02196566835720000179074304021004210010000036862",
+		},
+		{
+			name:                 "Valid Boleto 4",
+			barcode:              "02197100000000368626566857200001797430402100",
+			expectedBank:         "021",
+			expectedCurr:         "9",
+			expectedYear:         2025,
+			expectedMonth:        time.February,
+			expectedDay:          22,
+			expectedValue:        36862,
+			expectedFree:         "6566857200001797430402100",
+			expectedWritableLine: "02196566835720000179074304021004710000000036862",
+		},
+		{
 			name:                 "Valid Boleto - DST start",
 			barcode:              "00194694900000010001234567890123456789012345",
 			expectedBank:         "001",
@@ -99,6 +123,29 @@ func TestBoleto(t *testing.T) {
 			year, month, day = b.calcExpirationDateAt(time.Date(2025, time.February, 23, 0, 0, 0, 0, brTz))
 			if year != tt.expectedYear || month != tt.expectedMonth || day != tt.expectedDay {
 				t.Errorf("ExpirationDate() = %v-%v-%v, want %v-%v-%v", year, month, day, tt.expectedYear, tt.expectedMonth, tt.expectedDay)
+			}
+
+			// Today is less then the first 5500 days from the epoch
+			if tt.expectedYear < 2025 ||
+				(tt.expectedYear == 2025 &&
+					(tt.expectedMonth < time.February ||
+						tt.expectedMonth == time.February && tt.expectedDay < 22)) {
+				year, month, day = b.calcExpirationDateAt(time.Date(1999, time.July, 2, 0, 0, 0, 0, brTz))
+				if year != tt.expectedYear || month != tt.expectedMonth || day != tt.expectedDay {
+					t.Errorf("ExpirationDate() = %v-%v-%v, want %v-%v-%v", year, month, day, tt.expectedYear, tt.expectedMonth, tt.expectedDay)
+				}
+
+			}
+
+			// factor 4500 (DST date)
+			if tt.expectedYear < 2025 ||
+				(tt.expectedYear == 2025 &&
+					(tt.expectedMonth < time.February ||
+						tt.expectedMonth == time.February && tt.expectedDay <= 22)) {
+				year, month, day = b.calcExpirationDateAt(time.Date(2012, time.October, 28, 0, 0, 0, 0, brTz))
+				if year != tt.expectedYear || month != tt.expectedMonth || day != tt.expectedDay {
+					t.Errorf("ExpirationDate() = %v-%v-%v, want %v-%v-%v", year, month, day, tt.expectedYear, tt.expectedMonth, tt.expectedDay)
+				}
 			}
 
 			if got := b.Value(); got != tt.expectedValue {
