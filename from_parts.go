@@ -74,6 +74,9 @@ func withExpirationDateAt(now time.Time, year int, month time.Month, day int) In
 		}
 
 		today := now.In(brTz)
+		if today.IsDST() {
+			today = today.Add(time.Hour)
+		}
 		daysSinceEpoch := int64(today.Sub(epoch) / (24 * time.Hour))
 
 		diff := factor - daysSinceEpoch
