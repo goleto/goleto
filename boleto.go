@@ -76,7 +76,14 @@ func (b Boleto) calcExpirationDateAt(now time.Time) (year int, month time.Month,
 		}
 	}
 
-	return epoch.AddDate(0, 0, int(daysSinceEpoch-epochAdjust)).Date()
+	// The date can be the start of a DST period. So, e.g.:
+	//
+	// 1997-08-07T00:00:00 + 6949 days = 2016-10-16T00:00:00.
+	//
+	// But at that date, a DLS period starts. So the go time library go converts
+	// it to 2016-10-15H23:00:00. To avoid that day shift, we add 12 hours to
+	// the final calculated date.
+	return epoch.AddDate(0, 0, int(daysSinceEpoch-epochAdjust)).Add(12 * time.Hour).Date()
 }
 
 // Value extracts and returns the monetary value of the Boleto in cents.
