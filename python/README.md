@@ -1,6 +1,6 @@
 # Uso no python
 
-Para usar esse projeto no python é necessário primeiro exportar um shared library, que pode ser importada usando o módulo cff.
+Para usar esse projeto no python é necessário primeiro exportar um shared library, que pode ser importada usando o módulo `cffi` do python.
 
 Para isso, siga os seguintes passos:
 
@@ -17,7 +17,7 @@ Para isso, siga os seguintes passos:
 2. Instalar o pacote `cffi`
 
     ```
-    pip install cff
+    pip install cffi
     ```
 
 3. Usar a módulo `goleto` que está nesse diretório
