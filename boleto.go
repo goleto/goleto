@@ -35,6 +35,15 @@ func (b Boleto) CurrencyCode() string {
 	return b.validBarcode[3:4]
 }
 
+// DateFactor extracts the date factor from the Boleto.
+//
+// The date factor is a 4-digit substring starting at the 6th character of the barcode.
+// It converts this substring to an unsigned 16-bit integer and returns it.
+func (b Boleto) DateFactor() uint16 {
+	factor, _ := strconv.ParseUint(b.validBarcode[5:9], 10, 16)
+	return uint16(factor)
+}
+
 // ExpirationDate calculates and returns the expiration date of the Boleto.
 //
 // It extracts the number of days from the validBarcode field, adds these days
@@ -52,7 +61,7 @@ func (b Boleto) ExpirationDate() (year int, month time.Month, day int) {
 var brTz *time.Location
 
 func (b Boleto) calcExpirationDateAt(now time.Time) (year int, month time.Month, day int) {
-	factor, _ := strconv.ParseInt(b.validBarcode[5:9], 10, 32)
+	factor := int64(b.DateFactor())
 
 	if factor < 1000 {
 		epoch := time.Date(1997, time.October, 7, 0, 0, 0, 0, brTz)

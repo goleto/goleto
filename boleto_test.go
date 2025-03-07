@@ -11,6 +11,7 @@ func TestBoleto(t *testing.T) {
 		barcode              string
 		expectedBank         string
 		expectedCurr         string
+		expectedDateFactor   uint16
 		expectedYear         int
 		expectedMonth        time.Month
 		expectedDay          int
@@ -23,6 +24,7 @@ func TestBoleto(t *testing.T) {
 			barcode:              "02194999400000368626566857200001797430402100",
 			expectedBank:         "021",
 			expectedCurr:         "9",
+			expectedDateFactor:   9940,
 			expectedYear:         2025,
 			expectedMonth:        time.February,
 			expectedDay:          16,
@@ -35,6 +37,7 @@ func TestBoleto(t *testing.T) {
 			barcode:              "70792119000000421480001121154691201045051738",
 			expectedBank:         "707",
 			expectedCurr:         "9",
+			expectedDateFactor:   1190,
 			expectedYear:         2025,
 			expectedMonth:        time.August,
 			expectedDay:          31,
@@ -47,6 +50,7 @@ func TestBoleto(t *testing.T) {
 			barcode:              "02192100100000368626566857200001797430402100",
 			expectedBank:         "021",
 			expectedCurr:         "9",
+			expectedDateFactor:   1001,
 			expectedYear:         2025,
 			expectedMonth:        time.February,
 			expectedDay:          23,
@@ -59,6 +63,7 @@ func TestBoleto(t *testing.T) {
 			barcode:              "02197100000000368626566857200001797430402100",
 			expectedBank:         "021",
 			expectedCurr:         "9",
+			expectedDateFactor:   1000,
 			expectedYear:         2025,
 			expectedMonth:        time.February,
 			expectedDay:          22,
@@ -71,6 +76,7 @@ func TestBoleto(t *testing.T) {
 			barcode:              "00194694900000010001234567890123456789012345",
 			expectedBank:         "001",
 			expectedCurr:         "9",
+			expectedDateFactor:   6949,
 			expectedYear:         2016,
 			expectedMonth:        time.October,
 			expectedDay:          16,
@@ -83,6 +89,7 @@ func TestBoleto(t *testing.T) {
 			barcode:              "34196000200000233331098211174108055015849000",
 			expectedBank:         "341",
 			expectedCurr:         "9",
+			expectedDateFactor:   0,
 			expectedYear:         1997,
 			expectedMonth:        time.October,
 			expectedDay:          9,
