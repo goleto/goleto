@@ -61,6 +61,35 @@ func TestNewBoleto(t *testing.T) {
 			wantValid: "00191100000000010001234567890123456789012345",
 		},
 		{
+			name: "valid boleto in 1997",
+			initArgs: []InitArg{
+				WithBankCode("001"),
+				withExpirationDateAt(time.Date(2025, time.January, 28, 0, 0, 0, 0, brTz), 1997, time.October, 7),
+				WithValue(1000),
+				WithFreeField("1234567890123456789012345"),
+			},
+			wantErr:   false,
+			wantValid: "00198000000000010001234567890123456789012345",
+		},
+		{
+			name: "valid boleto in July 2 2000",
+			initArgs: []InitArg{
+				WithBankCode("001"),
+				withExpirationDateAt(time.Date(2025, time.January, 28, 0, 0, 0, 0, brTz), 2000, time.July, 2),
+				WithValue(1000),
+				WithFreeField("1234567890123456789012345"),
+			},
+			wantErr:   false,
+			wantValid: "00191099900000010001234567890123456789012345",
+		},
+		{
+			name: "expiration date not representable",
+			initArgs: []InitArg{
+				withExpirationDateAt(time.Date(2025, time.January, 28, 0, 0, 0, 0, brTz), 2000, time.July, 3),
+			},
+			wantErr: true,
+		},
+		{
 			name: "invalid bank code",
 			initArgs: []InitArg{
 				WithBankCode("1234"),

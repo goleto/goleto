@@ -73,19 +73,21 @@ func withExpirationDateAt(now time.Time, year int, month time.Month, day int) In
 			return ErrExpirationDateNotRepresentable
 		}
 
-		today := now.In(brTz)
-		if today.IsDST() {
-			today = today.Add(time.Hour)
+		if factor >= 0 {
+			today := now.In(brTz)
+			if today.IsDST() {
+				today = today.Add(time.Hour)
+			}
+			daysSinceEpoch := int64(today.Sub(epoch) / (24 * time.Hour))
+
+			diff := factor - daysSinceEpoch
+
+			if diff > 4500 || diff <= -4500 {
+				return ErrExpirationDateNotRepresentable
+			}
+
+			factor %= 9000
 		}
-		daysSinceEpoch := int64(today.Sub(epoch) / (24 * time.Hour))
-
-		diff := factor - daysSinceEpoch
-
-		if diff > 4500 || diff <= -4500 {
-			return ErrExpirationDateNotRepresentable
-		}
-
-		factor %= 9000
 
 		_, _ = fmt.Fprintf(bytes.NewBuffer(bp[:5]), "%04d", factor+1000)
 
