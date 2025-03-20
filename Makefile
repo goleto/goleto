@@ -1,4 +1,4 @@
-.PHONY: fmt setup install-linter lint test
+.PHONY: fmt setup install-linter lint test build
 
 setup: install-linter
 
@@ -13,3 +13,6 @@ test:
 
 fmt:
 	@go fmt ./...
+
+build:
+	@go build -o build/goleto ./cmd/goleto
