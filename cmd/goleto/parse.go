@@ -40,10 +40,10 @@ func (*parseCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...any) subcomman
 
 	if err := errors.Join(append(errs, ioErr)...); err != nil {
 		fmt.Printf("error: parse: %v\n", err)
-		return 1
+		return subcommands.ExitFailure
 	}
 
-	return 0
+	return subcommands.ExitSuccess
 }
 
 func parseSingle(barcode string, last bool) error {
