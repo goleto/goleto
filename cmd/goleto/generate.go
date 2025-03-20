@@ -45,7 +45,7 @@ func (g *generateCmd) Execute(_ context.Context, _ *flag.FlagSet, _ ...any) subc
 			continue
 		}
 		if g.detailed {
-			parseSingle(b.Barcode(), i == g.n-1)
+			_ = parseSingle(b.Barcode(), i == g.n-1)
 		} else {
 			fmt.Printf("%s\n", b.Barcode())
 		}
