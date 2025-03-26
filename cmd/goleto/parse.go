@@ -23,9 +23,16 @@ func (*parseCmd) SetFlags(_ *flag.FlagSet) {}
 func (*parseCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...any) subcommands.ExitStatus {
 	notDigits := regexp.MustCompile("[^0-9]+")
 	var errs []error
+	var barcodes []string
+	var ioErr error
 
-	barcodes, ioErr := readStdin()
 	barcodes = append(barcodes, f.Args()...)
+
+	if len(barcodes) == 0 {
+		var extra []string
+		extra, ioErr = readStdin()
+		barcodes = append(barcodes, extra...)
+	}
 
 	l := len(barcodes)
 	for i, b := range barcodes {
