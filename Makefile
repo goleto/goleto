@@ -16,3 +16,6 @@ fmt:
 
 build:
 	@go build -o build/goleto ./cmd/goleto
+
+generate:
+	@go generate ./...

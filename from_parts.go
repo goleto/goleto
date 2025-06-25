@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"math"
+	"math/rand"
 	"time"
 )
 
@@ -116,5 +118,78 @@ func WithFreeField(freeField string) InitArg {
 		_, _ = fmt.Fprintf(bytes.NewBuffer(bp[:19]), "%0*s", 25, freeField)
 
 		return nil
+	}
+}
+
+func WithRandomFields() InitArg {
+	inits := []InitArg{
+		WithRandomBankCode(),
+		WithDateIn(time.Now().AddDate(0, 0, 1), time.Now().AddDate(0, 0, 30)),
+		WithValueBy(3000, 1000),
+		WithRandomFreeField(),
+	}
+
+	return func(bp *[44]byte) error {
+		for _, init := range inits {
+			if e := init(bp); e != nil {
+				return e
+			}
+		}
+
+		return nil
+	}
+}
+
+func WithRandomBankCode() InitArg {
+	return func(bp *[44]byte) error {
+		bankCode := BankingCodes[rand.Int31n(int32(len(BankingCodes)))]
+		return WithBankCode(bankCode)(bp)
+	}
+}
+
+func WithDateIn(start, end time.Time) InitArg {
+	return withDateInAt(start, end, time.Now())
+}
+
+func withDateInAt(start, end, now time.Time) InitArg {
+	if end.Before(start) {
+		start, end = end, start // Ensure start is before end
+	}
+	return func(bp *[44]byte) error {
+		var randomInstant int64
+
+		if r := end.Unix() - start.Unix(); r == 0 {
+			randomInstant = start.Unix()
+		} else {
+			randomInstant = start.Unix() + rand.Int63n(r)
+		}
+
+		year, month, day := time.Unix(randomInstant, 0).Date()
+		return withExpirationDateAt(now, year, month, day)(bp)
+	}
+}
+
+func WithValueBy(mean uint64, stdDev uint64) InitArg {
+	return func(bp *[44]byte) error {
+		var r float64
+		for range 100 {
+			r = rand.NormFloat64()*float64(stdDev) + float64(mean)
+			if r > 0 && r < 10e8 {
+				return WithValue(uint64(math.RoundToEven(r)))(bp)
+			}
+		}
+
+		return ErrValueTooLarge
+	}
+}
+
+func WithRandomFreeField() InitArg {
+	return func(bp *[44]byte) error {
+		const digits = "0123456789"
+		b := make([]byte, 25)
+		for i := range b {
+			b[i] = digits[rand.Int31n(int32(len(digits)))]
+		}
+		return WithFreeField(string(b))(bp)
 	}
 }
